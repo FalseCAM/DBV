@@ -22,7 +22,7 @@ public class ImShow extends JFrame {
 
 	BufferedImage bufImage = null;
 
-	public ImShow(Mat image) {
+	public ImShow(String title, Mat image) {
 		Mat image_tmp = image;
 
 		MatOfByte matOfByte = new MatOfByte();
@@ -39,7 +39,7 @@ public class ImShow extends JFrame {
 			e.printStackTrace();
 		}
 		add(new JLabel(new ImageIcon(bufImage)));
-		this.setTitle(image.toString());
+		this.setTitle(title + " - " + image.toString());
 		pack();
 		this.setVisible(true);
 	}

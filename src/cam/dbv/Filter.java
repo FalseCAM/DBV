@@ -23,7 +23,9 @@ public class Filter {
 		PREWITTh("Prewitt h", 3, 3, 1, 0, -1, 1, 0, -1, 1, 0, -1), //
 		PREWITTv("Prewitt v", 3, 3, 1, 0, -1, 1, 0, -1, 1, 0, -1), //
 		SOBELh("Sobel h", 3, 3, 1, 0, -1, 2, 0, -2, 1, 0, -1), //
-		SOBELv("Sobel v", 3, 3, 1, 2, 1, 0, 0, 0, -1, -2, -1);
+		SOBELv("Sobel v", 3, 3, 1, 2, 1, 0, 0, 0, -1, -2, -1), //
+		LAPLACE1("Laplace ", 3, 3, 0, 1, 0, 1, -4, 1, 0, 1, 0), //
+		LAPLACE2("Laplace ", 3, 3, 1, 1, 1, 1, -8, 1, 1, 1, 1);
 
 		String name;
 		int rows;
@@ -58,11 +60,12 @@ public class Filter {
 	private void convolve() {
 		Mat filtered1 = new Mat();
 		Mat filtered2 = new Mat();
-		Imgproc.filter2D(image, filtered1, -1, FilterType.SOBELh.toMat());
-		Imgproc.filter2D(image, filtered2, -1, FilterType.SOBELv.toMat());
-		// Core.multiply(image, new Scalar(255), image);
-		new ImShow(filtered1);
-		new ImShow(filtered2);
+		Imgproc.filter2D(image, filtered1, -1, FilterType.LAPLACE1.toMat());
+		Imgproc.filter2D(image, filtered2, -1, FilterType.LAPLACE2.toMat());
+		new ImShow("Filter 1", filtered1);
+		Imgproc.cvtColor(filtered2, filtered2, Imgproc.COLOR_RGB2GRAY);
+		new ImShow("Filter 2", filtered2);
+		// System.out.println(filtered1.dump());
 
 	}
 
