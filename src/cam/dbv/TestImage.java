@@ -9,7 +9,8 @@ public enum TestImage {
 			"Zebras black&white", "zebras_bw.png"), MOON("Moon",
 			"moon_blurry.png"), WHALE1("Whale 1", "rubberWhale09.png"), WHALE2(
 			"Whale 2", "rubberWhale10.png"), YOSEMITE1("Yosemite 1",
-			"yosemite10.png"), YOSEMITE2("Yosemite 2", "yosemite11.png");
+			"yosemite10.png"), YOSEMITE2("Yosemite 2", "yosemite11.png"), BOAT(
+			"Boat", "Boat.png");
 
 	private String name;
 	private String file;

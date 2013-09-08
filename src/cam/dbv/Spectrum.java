@@ -6,46 +6,58 @@ import java.util.List;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
-import org.opencv.imgproc.Imgproc;
+import org.opencv.core.Scalar;
 
 public class Spectrum {
 
 	private Mat image;
+	private Mat phase;
+	private Mat amplitude;
 
 	public Spectrum(Mat image) {
 		this.image = image;
+		calcAmplitude();
+		calcPhase();
+	}
+
+	private void calcAmplitude() {
+		Mat dft = DBV.dft(image);
+		this.amplitude = DBV.abs(dft);
+	}
+
+	private void calcPhase() {
+		Mat dft = DBV.dft(image);
+		this.phase = DBV.angle(dft);
+
 	}
 
 	public Mat getAmplitude() {
+		return amplitude;
 
-		Mat dft = ConvertToDFT(image);
-		return dft;
+	}
 
+	public Mat getVisualizeableAmplitude() {
+		Mat amplitude = getAmplitude();
+		amplitude.convertTo(amplitude, CvType.CV_32F);
+		Core.add(amplitude, Scalar.all(1), amplitude);
+		amplitude = DBV.log(amplitude);
+		amplitude = DBV.dftShift(amplitude);
+		Core.normalize(amplitude, amplitude, 0, 255, Core.NORM_MINMAX);
+		List<Mat> chan = new ArrayList<Mat>();
+		Core.split(amplitude, chan);
+		return chan.get(0);
 	}
 
 	public Mat getPhase() {
-		return image;
 
+		return phase;
 	}
 
-	Mat ConvertToDFT(Mat input) {
-		int N = input.cols() * 2;
-		int M = input.rows() * 2;
-
-		Imgproc.cvtColor(input, input, Imgproc.COLOR_BGR2GRAY);
-
-		List<Mat> planes = new ArrayList<Mat>();
-		Mat padded = new Mat();
-		input.convertTo(input, CvType.CV_64F);
-		Imgproc.copyMakeBorder(input, padded, 0, M - input.rows(), 0,
-				N - input.cols(), Imgproc.BORDER_CONSTANT);
-		planes.add(padded);
-		Mat complexImg = new Mat();
-		Core.merge(planes, complexImg);
-		Mat ret = new Mat();
-		Core.dft(complexImg, ret, 0, input.rows());
-		ret.convertTo(ret, 0);
-		return ret;
+	public Mat getVisualizeablePhase() {
+		Mat phase = getPhase();
+		phase = DBV.dftShift(phase);
+		Core.normalize(phase, phase, 0, 255, Core.NORM_MINMAX);
+		return phase;
 	}
 
 }

@@ -57,8 +57,10 @@ public class Aufgaben {
 		Mat image = TestImage.LENA.toMat();
 		new ImShow(image, "Original");
 		Spectrum spectrum = new Spectrum(image);
-		Mat amplitude = spectrum.getAmplitude();
+		Mat amplitude = spectrum.getVisualizeableAmplitude();
 		new ImShow(amplitude, "Amplitude", 512, 512);
+		Mat phase = spectrum.getVisualizeablePhase();
+		new ImShow(phase, "Phase", 512, 512);
 	}
 
 }
