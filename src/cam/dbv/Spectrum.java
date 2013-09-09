@@ -20,6 +20,24 @@ public class Spectrum {
 		calcPhase();
 	}
 
+	public Spectrum(Mat amplitude, Mat phase) {
+		this.image = new Mat();
+		this.amplitude = amplitude;
+		this.phase = phase;
+		calcImage();
+	}
+
+	private void calcImage() {
+		Mat cPhase = phase.clone();
+
+		cPhase = DBV.toComplexMat(cPhase, false);
+		cPhase = DBV.exp(cPhase);
+		Mat cAmp = amplitude.clone();
+		cAmp = DBV.toComplexMat(cAmp, true);
+		Core.multiply(cAmp, cPhase, this.image);
+		this.image = DBV.idft(this.image);
+	}
+
 	private void calcAmplitude() {
 		Mat dft = DBV.dft(image);
 		this.amplitude = DBV.abs(dft);
@@ -28,17 +46,23 @@ public class Spectrum {
 	private void calcPhase() {
 		Mat dft = DBV.dft(image);
 		this.phase = DBV.angle(dft);
+	}
 
+	public Mat getImage() {
+		return image;
 	}
 
 	public Mat getAmplitude() {
 		return amplitude;
+	}
 
+	public Mat getPhase() {
+		return phase;
 	}
 
 	public Mat getVisualizeableAmplitude() {
 		Mat amplitude = getAmplitude();
-		amplitude.convertTo(amplitude, CvType.CV_32F);
+		amplitude.convertTo(amplitude, CvType.CV_64F);
 		Core.add(amplitude, Scalar.all(1), amplitude);
 		amplitude = DBV.log(amplitude);
 		amplitude = DBV.dftShift(amplitude);
@@ -46,11 +70,6 @@ public class Spectrum {
 		List<Mat> chan = new ArrayList<Mat>();
 		Core.split(amplitude, chan);
 		return chan.get(0);
-	}
-
-	public Mat getPhase() {
-
-		return phase;
 	}
 
 	public Mat getVisualizeablePhase() {
