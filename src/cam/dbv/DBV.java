@@ -27,6 +27,36 @@ public class DBV {
 		return filtered;
 	}
 
+	public static Mat convolveRotate(Mat image, Mat filter) {
+		if (filter.width() != 3 || filter.height() != 3) {
+			return image;
+		}
+		Mat ret = image.clone();
+		for (int i = 0; i < 4; i++) {
+			Mat f = rotate3x3Mat(filter, i);
+			Core.add(ret, convolve(ret, f), ret);
+		}
+		Core.divide(ret, Scalar.all(4), ret);
+		return ret;
+	}
+
+	public static Mat rotate3x3Mat(Mat mat, int step) {
+		Mat copy = mat.clone();
+		copy.convertTo(copy, CvType.CV_64F);
+		Mat ret = new Mat(3, 3, CvType.CV_64F);
+		double[] matV = new double[9];
+		copy.get(0, 0, matV);
+		double[] v = matV;
+		for (int i = 0; i < step; i++) {
+
+			v = new double[] { v[3], v[0], v[1], v[6], v[4], v[2], v[7], v[8],
+					v[5] };
+		}
+
+		ret.put(0, 0, v);
+		return ret;
+	}
+
 	public static Mat harrisPoints(Mat image, double k) {
 		StructureTensor sT = new StructureTensor(image);
 		Mat detA = sT.getIx2().mul(sT.getIy2());
@@ -85,9 +115,29 @@ public class DBV {
 	 * @return elementwise logarithm value of a matrix
 	 */
 	public static Mat log(Mat mat) {
-		Mat temp = new Mat();
-		Core.log(mat, temp);
-		return temp;
+		Mat ret = new Mat();
+
+		// log(z) = log(abs(z)) + 1i*atan2(y,a)
+		if (mat.channels() == 2) {
+			Mat x = new Mat();
+			Mat y = new Mat();
+			Core.extractChannel(mat, x, 0);
+			Core.extractChannel(mat, y, 1);
+
+			Mat absz = abs(mat);
+			Core.log(absz, absz);
+
+			Mat atan = angle(mat);
+
+			List<Mat> planes = new ArrayList<Mat>();
+			planes.add(absz);
+			planes.add(atan);
+			Core.merge(planes, ret);
+		} else {
+			Core.log(mat, ret);
+		}
+		return ret;
+
 	}
 
 	/**
@@ -122,6 +172,16 @@ public class DBV {
 			return e_z;
 		} else {
 			Core.exp(mat, ret);
+		}
+		return ret;
+	}
+
+	public static Mat multiply(Mat src1, Mat src2) {
+		Mat ret = new Mat();
+		if (src1.channels() == 2) {
+			Core.mulSpectrums(src1, src2, ret, 0);
+		} else {
+			Core.multiply(src1, src2, ret);
 		}
 		return ret;
 	}
@@ -177,9 +237,20 @@ public class DBV {
 	}
 
 	public static Mat idft(Mat img) {
+		return idft(img, false);
+	}
+
+	public static Mat idft(Mat img, boolean scale) {
 		Mat input = img.clone();
 		Mat ret = new Mat();
-		Core.dft(input, ret, Core.DFT_INVERSE | Core.DFT_REAL_OUTPUT, 0);
+
+		if (scale) {
+			Core.dft(input, ret, Core.DFT_INVERSE | Core.DFT_SCALE
+					| Core.DFT_REAL_OUTPUT, 0);
+		} else {
+			Core.dft(input, ret, Core.DFT_INVERSE | Core.DFT_REAL_OUTPUT, 0);
+		}
+
 		return ret;
 	}
 
@@ -207,9 +278,8 @@ public class DBV {
 	 */
 	public static Mat real(Mat input) {
 		if (input.channels() == 2) {
-			List<Mat> chan = new ArrayList<Mat>();
-			Core.split(input, chan);
-			Mat ret = chan.get(0);
+			Mat ret = new Mat();
+			Core.extractChannel(input, ret, 0);
 			return ret;
 		} else {
 			return input;
@@ -223,17 +293,15 @@ public class DBV {
 	 */
 	public static Mat imag(Mat input) {
 		if (input.channels() == 2) {
-			List<Mat> chan = new ArrayList<Mat>();
-			Core.split(input, chan);
-			Mat ret = chan.get(1);
-			// ret.convertTo(ret, CvType.CV_64F);
+			Mat ret = new Mat();
+			Core.extractChannel(input, ret, 1);
 			return ret;
 		} else {
 			return input;
 		}
 	}
 
-	public static Mat toComplexMat(Mat input, boolean realInput) {
+	public static Mat complex(Mat input, boolean realInput) {
 		List<Mat> planes = new ArrayList<Mat>();
 
 		if (realInput) {

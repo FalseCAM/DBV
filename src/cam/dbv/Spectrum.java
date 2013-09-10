@@ -6,6 +6,7 @@ import java.util.List;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 
 public class Spectrum {
@@ -22,20 +23,27 @@ public class Spectrum {
 
 	public Spectrum(Mat amplitude, Mat phase) {
 		this.image = new Mat();
-		this.amplitude = amplitude;
-		this.phase = phase;
-		calcImage();
+		this.amplitude = amplitude.clone();
+		this.phase = phase.clone();
+		if (amplitude.type() != phase.type()) {
+			this.amplitude.convertTo(amplitude, CvType.CV_64F);
+			this.phase.convertTo(phase, CvType.CV_64F);
+		}
+		this.image = calcImage(amplitude, phase);
 	}
 
-	private void calcImage() {
+	private Mat calcImage(Mat amplitude, Mat phase) {
+		Mat image = new Mat(amplitude.size(), CvType.CV_64F);
 		Mat cPhase = phase.clone();
 
-		cPhase = DBV.toComplexMat(cPhase, false);
+		cPhase = DBV.complex(cPhase, false);
 		cPhase = DBV.exp(cPhase);
 		Mat cAmp = amplitude.clone();
-		cAmp = DBV.toComplexMat(cAmp, true);
-		Core.multiply(cAmp, cPhase, this.image);
-		this.image = DBV.idft(this.image);
+		cAmp = DBV.complex(cAmp, true);
+		image = DBV.multiply(cAmp, cPhase);
+		image = DBV.idft(image);
+		return DBV.real(image);
+
 	}
 
 	private void calcAmplitude() {
@@ -77,6 +85,13 @@ public class Spectrum {
 		phase = DBV.dftShift(phase);
 		Core.normalize(phase, phase, 0, 255, Core.NORM_MINMAX);
 		return phase;
+	}
+
+	public void reshapeAmplitude(Rect rect) {
+		Mat tempAmp = DBV.dftShift(this.amplitude);
+		Mat reshaped = Mat.ones(this.amplitude.size(), this.amplitude.type());
+		tempAmp.submat(rect).copyTo(reshaped.submat(rect));
+		this.amplitude = DBV.dftShift(reshaped);
 	}
 
 }

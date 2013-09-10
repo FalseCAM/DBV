@@ -72,7 +72,7 @@ public class ImShow extends JFrame {
 	}
 
 	BufferedImage matToImage(Mat image) {
-		Mat image_tmp = image;
+		Mat image_tmp = image.clone();
 
 		MatOfByte matOfByte = new MatOfByte();
 

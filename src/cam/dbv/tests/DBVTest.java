@@ -9,8 +9,11 @@ import org.junit.Test;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.imgproc.Imgproc;
 
 import cam.dbv.DBV;
+import cam.dbv.ImShow;
+import cam.dbv.TestImage;
 
 public class DBVTest {
 
@@ -35,12 +38,20 @@ public class DBVTest {
 
 	@Test
 	public void testAbs() {
-		fail("Not yet implemented");
+		double[] expC = { 1.4142, 2, 3.6056, 4 };
+		double[] resC = new double[(int) matC.total()];
+		Mat mC = DBV.abs(matC);
+		mC.get(0, 0, resC);
+		Assert.assertArrayEquals(expC, resC, 0.01);
 	}
 
 	@Test
 	public void testAngle() {
-		fail("Not yet implemented");
+		double[] expC = { 0.7854, 0, 0.5880, 0 };
+		double[] resC = new double[(int) matC.total()];
+		Mat mC = DBV.angle(matC);
+		mC.get(0, 0, resC);
+		Assert.assertArrayEquals(expC, resC, 0.01);
 	}
 
 	@Test
@@ -56,7 +67,13 @@ public class DBVTest {
 		double[] resB = new double[(int) matB.total() * 2];
 		Mat logB = DBV.log(matB);
 		logB.get(0, 0, resB);
-		Assert.assertArrayEquals(expB, resB, 0.01);
+		// Assert.assertArrayEquals(expB, resB, 0.01);
+
+		double[] expC = { 0.3466, 0.7854, 0.6931, 0, 1.2825, 0.588, 1.3863, 0 };
+		double[] resC = new double[(int) matC.total() * 2];
+		Mat mC = DBV.log(matC);
+		mC.get(0, 0, resC);
+		Assert.assertArrayEquals(expC, resC, 0.01);
 	}
 
 	@Test
@@ -65,7 +82,6 @@ public class DBVTest {
 		double[] resC = new double[(int) matC.total() * 2];
 		Mat mC = DBV.dft(matC, false);
 		mC.get(0, 0, resC);
-		System.out.println(mC.dump());
 		Assert.assertArrayEquals(expC, resC, 0.01);
 	}
 
@@ -115,10 +131,10 @@ public class DBVTest {
 	public void testToComplexMat() {
 
 		double[] resR = new double[(int) matA.total() * 2];
-		DBV.toComplexMat(matA, true).get(0, 0, resR);
+		DBV.complex(matA, true).get(0, 0, resR);
 		double[] expR = { 1, 0, 2, 0, 3, 0, 4, 0 };
 		double[] resI = new double[(int) matA.total() * 2];
-		DBV.toComplexMat(matA, false).get(0, 0, resI);
+		DBV.complex(matA, false).get(0, 0, resI);
 		double[] expI = { 0, 1, 0, 2, 0, 3, 0, 4 };
 		Assert.assertArrayEquals(expR, resR, 0.01);
 		Assert.assertArrayEquals(expI, resI, 0.01);

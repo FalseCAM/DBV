@@ -17,7 +17,8 @@ public enum Filter {
 	SOBELh("Sobel h", 3, 3, 1, 0, -1, 2, 0, -2, 1, 0, -1), //
 	SOBELv("Sobel v", 3, 3, 1, 2, 1, 0, 0, 0, -1, -2, -1), //
 	LAPLACE1("Laplace ", 3, 3, 0, 1, 0, 1, -4, 1, 0, 1, 0), //
-	LAPLACE2("Laplace ", 3, 3, 1, 1, 1, 1, -8, 1, 1, 1, 1);
+	LAPLACE2("Laplace ", 3, 3, 1, 1, 1, 1, -8, 1, 1, 1, 1), //
+	KIRSCH("Kirsch", 3, 3, 5, 5, 5, -3, 0, -3, -3, -3, -3);
 
 	String name;
 	int rows;
@@ -57,6 +58,16 @@ public enum Filter {
 	public static void showFiltered(Mat image, Filter filter) {
 		Mat filtered = DBV.convolve(image, filter.toMat());
 		new ImShow(filtered, filter.toString() + " - " + filtered.toString());
+	}
+
+	public static void showFiltered(Mat image, Filter filter, boolean rotate) {
+		if (rotate) {
+			Mat filtered = DBV.convolveRotate(image, filter.toMat());
+			new ImShow(filtered, filter.toString() + " - "
+					+ filtered.toString());
+		} else {
+			showFiltered(image, filter);
+		}
 	}
 
 	/**

@@ -3,6 +3,8 @@ package cam.dbv;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
 public class Aufgaben {
@@ -10,7 +12,7 @@ public class Aufgaben {
 	public static void main(String[] args) {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		Aufgaben a = new Aufgaben();
-		a.aufgabeSpectra2();
+		a.aufgabeFilterRotate();
 	}
 
 	public Aufgaben() {
@@ -36,6 +38,26 @@ public class Aufgaben {
 		Filter.showFiltered(image, Filter.SOBELh);
 	}
 
+	public void aufgabeFilterNeighbour() {
+		Mat image = TestImage.TEXTSTRUCTURE.toMat();
+		new ImShow(image, "Original");
+
+		Filter.showFiltered(image, Filter.DERIVATIVEx);
+		Filter.showFiltered(image, Filter.DERIVATIVEy);
+		Filter.showFiltered(image, Filter.ROBERTSCROSSn);
+		Filter.showFiltered(image, Filter.ROBERTSCROSSp);
+		System.out.println(Filter.ROBERTSCROSSn.toMat().dump());
+		System.out.println(Filter.ROBERTSCROSSp.toMat().dump());
+	}
+
+	public void aufgabeFilterRotate() {
+		Mat image = TestImage.LENA.toMat();
+		new ImShow(image, "Original");
+		Filter.showFiltered(image, Filter.KIRSCH);
+		Filter.showFiltered(image, Filter.KIRSCH, true);
+		Filter.showFiltered(image, Filter.LAPLACE1, true);
+	}
+
 	public void aufgabeSharpen() {
 		Mat image = TestImage.MOON.toMat();
 		new ImShow(image, "Original");
@@ -54,14 +76,12 @@ public class Aufgaben {
 	}
 
 	public void aufgabeSpectra() {
-		Mat image = TestImage.BOAT.toMat();
+		Mat image = TestImage.LENA.toMat();
 		new ImShow(image, "Original", 512, 512);
 		Spectrum spectrum = new Spectrum(image);
 		Mat amplitude = spectrum.getVisualizeableAmplitude();
-		System.out.println(spectrum.getAmplitude().dump());
 		new ImShow(amplitude, "Amplitude", 512, 512);
 		Mat phase = spectrum.getVisualizeablePhase();
-		System.out.println(spectrum.getPhase().dump());
 		new ImShow(phase, "Phase", 512, 512);
 	}
 
@@ -101,6 +121,58 @@ public class Aufgaben {
 		Spectrum a2p1 = new Spectrum(s2.getAmplitude(), s1.getPhase());
 		new ImShow(a2p1.getImage(), "Amplitude Image 2, Phase Image 1", 512,
 				512);
+
+	}
+
+	public void aufgabeReshapedSpectra() {
+		Mat img1 = TestImage.LENA.toMat();
+		new ImShow(img1, "Original1");
+		Spectrum s1 = new Spectrum(img1);
+		int w = (int) img1.size().width;
+		int h = (int) img1.size().height;
+
+		new ImShow(s1.getVisualizeableAmplitude(), "Amplitude", 512, 512);
+
+		s1.reshapeAmplitude(new Rect(w / 8, h / 8, 6 * w / 8, 6 * h / 8));
+
+		new ImShow(s1.getVisualizeableAmplitude(), "reshaped Amplitude", 512,
+				512);
+		Spectrum a1p1 = new Spectrum(s1.getAmplitude(), s1.getPhase());
+
+		new ImShow(a1p1.getImage(), "Result", 512, 512);
+
+	}
+
+	public void aufgabeDumpSpectra() {
+		Mat img1 = TestImage.LENAoverlay.toMat();
+		// new ImShow(img1, "Original1");
+		Spectrum s1 = new Spectrum(img1);
+		int w = (int) img1.size().width;
+		int h = (int) img1.size().height;
+		Spectrum a2p2 = new Spectrum(s1.getAmplitude(), s1.getPhase());
+		Mat amp = s1.getAmplitude();
+		new ImShow(s1.getVisualizeableAmplitude(), "Amplitude", 1024, 1024);
+		Mat gaussian = Filter.getGaussianFilter(15, 2.5);
+		Mat filtered = DBV.convolve(amp, gaussian);
+		Spectrum a1p1 = new Spectrum(filtered, s1.getPhase());
+		// new ImShow(a1p1.getImage(), "Result filtered", 512, 512);
+
+		Mat sAmp = s1.getAmplitude();
+		Core.MinMaxLocResult res = Core.minMaxLoc(sAmp);
+		System.out.println("Amplitude max Value " + res.maxVal
+				+ " at Position " + res.maxLoc + " (not shifted)");
+		Mat sMax = new Mat();
+		Core.min(sAmp, Scalar.all(120), sMax);
+		sMax = sAmp;
+		sMax.convertTo(sAmp, CvType.CV_32F);
+
+		// // ???????? ///
+
+		// Imgproc.threshold(sMax, sMax, 80, 80, Imgproc.THRESH_TRUNC);
+		Spectrum a3p3 = new Spectrum(sMax, s1.getPhase());
+		new ImShow(a3p3.getVisualizeableAmplitude(), "Amplitude cropped", 1024,
+				1024);
+		new ImShow(a3p3.getImage(), "Result cropped", 512, 512);
 
 	}
 
