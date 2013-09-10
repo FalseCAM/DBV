@@ -12,7 +12,8 @@ public class Aufgaben {
 	public static void main(String[] args) {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		Aufgaben a = new Aufgaben();
-		a.aufgabeFilterRotate();
+		a.aufgabeLowpass();
+		a.aufgabeHighpass();
 	}
 
 	public Aufgaben() {
@@ -23,19 +24,30 @@ public class Aufgaben {
 		Mat image = TestImage.LENA.toMat();
 		new ImShow(image, "Original");
 		// Gauss
-		Mat gaussian = Filter.getGaussianFilter(5, 1.8);
+		image = DBV.convolve(image, Filter.KIRSCH.toMat());
+
+		Mat gaussian = Filter.getGaussianFilter(9, 1.8);
 		Mat filtered = DBV.convolve(image, gaussian);
 		new ImShow(filtered, "Gaussian Filter - " + filtered.toString());
 
-		Mat gaussian2 = Filter.getGaussianFilter(5, 6.8);
+		Mat gaussian2 = Filter.getGaussianFilter(9, 500);
 		Mat filtered2 = DBV.convolve(image, gaussian2);
 		new ImShow(filtered2, "Gaussian Filter - " + filtered2.toString());
 		// others
 
-		Filter.showFiltered(image, Filter.LAPLACE1);
-		Filter.showFiltered(image, Filter.PREWITTv);
-		Imgproc.cvtColor(image, image, Imgproc.COLOR_RGB2GRAY);
-		Filter.showFiltered(image, Filter.SOBELh);
+		// Filter.showFiltered(image, Filter.DERIVATIVEx);
+		// Filter.showFiltered(image, Filter.DERIVATIVEy);
+		// Filter.showFiltered(image, Filter.KIRSCH);
+		// Filter.showFiltered(image, Filter.LAPLACE1);
+		// Filter.showFiltered(image, Filter.LAPLACE2);
+		// Filter.showFiltered(image, Filter.PREWITTh);
+		// Filter.showFiltered(image, Filter.PREWITTv);
+		// Filter.showFiltered(image, Filter.ROBERTSCROSSn);
+		// Filter.showFiltered(image, Filter.ROBERTSCROSSp);
+		// Filter.showFiltered(image, Filter.SOBELh);
+		// Filter.showFiltered(image, Filter.SOBELv);
+		// Imgproc.cvtColor(image, image, Imgproc.COLOR_RGB2GRAY);
+		// Filter.showFiltered(image, Filter.SOBELh);
 	}
 
 	public void aufgabeFilterNeighbour() {
@@ -51,11 +63,11 @@ public class Aufgaben {
 	}
 
 	public void aufgabeFilterRotate() {
-		Mat image = TestImage.LENA.toMat();
+		Mat image = TestImage.TEXTSTRUCTURE.toMat();
 		new ImShow(image, "Original");
 		Filter.showFiltered(image, Filter.KIRSCH);
 		Filter.showFiltered(image, Filter.KIRSCH, true);
-		Filter.showFiltered(image, Filter.LAPLACE1, true);
+		// Filter.showFiltered(image, Filter.LAPLACE1, true);
 	}
 
 	public void aufgabeSharpen() {
@@ -76,7 +88,7 @@ public class Aufgaben {
 	}
 
 	public void aufgabeSpectra() {
-		Mat image = TestImage.LENA.toMat();
+		Mat image = TestImage.BRICKWALL.toMat();
 		new ImShow(image, "Original", 512, 512);
 		Spectrum spectrum = new Spectrum(image);
 		Mat amplitude = spectrum.getVisualizeableAmplitude();
@@ -133,7 +145,7 @@ public class Aufgaben {
 
 		new ImShow(s1.getVisualizeableAmplitude(), "Amplitude", 512, 512);
 
-		s1.reshapeAmplitude(new Rect(w / 8, h / 8, 6 * w / 8, 6 * h / 8));
+		s1.reshapeAmplitude(new Rect(w / 4, h / 4, w / 2, h / 2));
 
 		new ImShow(s1.getVisualizeableAmplitude(), "reshaped Amplitude", 512,
 				512);
@@ -155,7 +167,7 @@ public class Aufgaben {
 		Mat gaussian = Filter.getGaussianFilter(15, 2.5);
 		Mat filtered = DBV.convolve(amp, gaussian);
 		Spectrum a1p1 = new Spectrum(filtered, s1.getPhase());
-		// new ImShow(a1p1.getImage(), "Result filtered", 512, 512);
+		new ImShow(a1p1.getImage(), "Result filtered", 512, 512);
 
 		Mat sAmp = s1.getAmplitude();
 		Core.MinMaxLocResult res = Core.minMaxLoc(sAmp);
@@ -174,6 +186,62 @@ public class Aufgaben {
 				1024);
 		new ImShow(a3p3.getImage(), "Result cropped", 512, 512);
 
+	}
+
+	public void aufgabeLowpass() {
+		int cutoff = 50;
+		int order = 5;
+		Mat img = TestImage.TESTIMAGE.toMat();
+		img = DBV.padded(img, img.width() / 2);
+		img = DBV.dftShift(DBV.dft(img));
+		img.convertTo(img, CvType.CV_64F);
+		Mat distances = PassFilter.getDistances(img.width(), img.height());
+
+		Mat idealLF = PassFilter.getIdealLowpass(distances, cutoff);
+		Mat imgILF = DBV.multiply(img, idealLF);
+		imgILF = DBV.real(DBV.idft(DBV.dftShift(imgILF)));
+		new ImShow(imgILF, "Ideal Lowpass Filtered", 512, 512);
+
+		Spectrum s = new Spectrum(imgILF);
+		new ImShow(s.getVisualizeableAmplitude(),
+				"Amplitude ideal filtered, cutoff=" + cutoff, 512, 512);
+
+		Mat gaussianLF = PassFilter.getGaussianLowpass(distances, cutoff);
+		Mat imgGLF = DBV.multiply(img, gaussianLF);
+		imgGLF = DBV.real(DBV.idft(DBV.dftShift(imgGLF)));
+		new ImShow(imgGLF, "Gaussian Lowpass Filtered", 512, 512);
+
+		Mat butterworthLF = PassFilter.getButterworthLowpass(distances, cutoff,
+				order);
+		Mat imgBLF = DBV.multiply(img, butterworthLF);
+		imgBLF = DBV.real(DBV.idft(DBV.dftShift(imgBLF)));
+		new ImShow(imgBLF, "Butterworth Lowpass Filtered", 512, 512);
+	}
+
+	public void aufgabeHighpass() {
+		int cutoff = 20;
+		int order = 5;
+		Mat img = TestImage.TESTIMAGE.toMat();
+		img = DBV.padded(img, img.width() / 2);
+		img = DBV.dftShift(DBV.dft(img));
+		// img.convertTo(img, CvType.CV_64F);
+		Mat distances = PassFilter.getDistances(img.width(), img.height());
+
+		Mat idealLF = PassFilter.getIdealHighpass(distances, cutoff);
+		Mat imgILF = DBV.multiply(img, idealLF);
+		imgILF = DBV.real(DBV.idft(DBV.dftShift(imgILF)));
+		new ImShow(imgILF, "Ideal Highpass Filtered", 512, 512, true);
+
+		Mat gaussianLF = PassFilter.getGaussianHighpass(distances, cutoff);
+		Mat imgGLF = DBV.multiply(img, gaussianLF);
+		imgGLF = DBV.real(DBV.idft(DBV.dftShift(imgGLF)));
+		new ImShow(imgGLF, "Gaussian Highpass Filtered", 512, 512, true);
+
+		Mat butterworthLF = PassFilter.getButterworthHighpass(distances,
+				cutoff, order);
+		Mat imgBLF = DBV.multiply(img, butterworthLF);
+		imgBLF = DBV.real(DBV.idft(DBV.dftShift(imgBLF)));
+		new ImShow(imgBLF, "Butterworth Highpass Filtered", 512, 512, true);
 	}
 
 }

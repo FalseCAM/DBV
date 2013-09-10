@@ -11,7 +11,8 @@ public enum TestImage {
 			"Whale 2", "rubberWhale10.png"), YOSEMITE1("Yosemite 1",
 			"yosemite10.png"), YOSEMITE2("Yosemite 2", "yosemite11.png"), BOAT(
 			"Boat", "Boat.png"), LENAoverlay("Lena overlay", "Lena_overlay.png"), TESTIMAGE(
-			"Testimage", "testImage.png");
+			"Testimage", "testImage.png"), BRICKWALL("Brick wall",
+			"brickwall.jpg");
 
 	private String name;
 	private String file;

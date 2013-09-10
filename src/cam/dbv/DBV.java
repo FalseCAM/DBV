@@ -28,15 +28,18 @@ public class DBV {
 	}
 
 	public static Mat convolveRotate(Mat image, Mat filter) {
+		int rotations = 7;
 		if (filter.width() != 3 || filter.height() != 3) {
 			return image;
 		}
+		//Mat ret = Mat.zeros(image.size(), image.type());
 		Mat ret = image.clone();
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < rotations; i++) {
 			Mat f = rotate3x3Mat(filter, i);
-			Core.add(ret, convolve(ret, f), ret);
+			//Core.add(ret, convolve(image, f), ret);
+			ret = convolve(ret, f);
 		}
-		Core.divide(ret, Scalar.all(4), ret);
+		//Core.divide(ret, Scalar.all(rotations), ret);
 		return ret;
 	}
 
@@ -52,7 +55,6 @@ public class DBV {
 			v = new double[] { v[3], v[0], v[1], v[6], v[4], v[2], v[7], v[8],
 					v[5] };
 		}
-
 		ret.put(0, 0, v);
 		return ret;
 	}
@@ -176,9 +178,17 @@ public class DBV {
 		return ret;
 	}
 
-	public static Mat multiply(Mat src1, Mat src2) {
+	public static Mat multiply(Mat source1, Mat source2) {
+		Mat src1 = source1.clone();
+		Mat src2 = source2.clone();
 		Mat ret = new Mat();
 		if (src1.channels() == 2) {
+			if (src2.channels() == 1) {
+				List<Mat> planes = new ArrayList<Mat>();
+				planes.add(src2);
+				planes.add(src2);
+				Core.merge(planes, src2);
+			}
 			Core.mulSpectrums(src1, src2, ret, 0);
 		} else {
 			Core.multiply(src1, src2, ret);
@@ -316,6 +326,13 @@ public class DBV {
 		Mat complexImg = new Mat();
 		Core.merge(planes, complexImg);
 		return complexImg;
+	}
+
+	public static Mat padded(Mat input, int size) {
+		Mat ret = input.clone();
+		Imgproc.copyMakeBorder(ret, ret, size, size, size, size,
+				Imgproc.BORDER_CONSTANT);
+		return ret;
 	}
 
 }
