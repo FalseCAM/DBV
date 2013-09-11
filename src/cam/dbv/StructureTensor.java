@@ -10,7 +10,7 @@ public class StructureTensor {
 	private Mat gaussianFilter;
 
 	public StructureTensor(Mat image) {
-		this.image = image;
+		this.image = image.clone();
 		this.gaussianFilter = Filter.getGaussianFilter(3, 1.5);
 		Ix = DBV.convolve(image, Filter.DERIVATIVEx.toMat());
 		Iy = DBV.convolve(image, Filter.DERIVATIVEy.toMat());

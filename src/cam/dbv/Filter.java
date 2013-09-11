@@ -18,14 +18,16 @@ public enum Filter {
 	SOBELv("Sobel v", 3, 3, 1, 2, 1, 0, 0, 0, -1, -2, -1), //
 	LAPLACE1("Laplace ", 3, 3, 0, 1, 0, 1, -4, 1, 0, 1, 0), //
 	LAPLACE2("Laplace ", 3, 3, 1, 1, 1, 1, -8, 1, 1, 1, 1), //
-	KIRSCH("Kirsch", 3, 3, 5, 5, 5, -3, 0, -3, -3, -3, -3);
+	KIRSCH("Kirsch", 3, 3, 5, 5, 5, -3, 0, -3, -3, -3, -3), //
+	GLAETTUNG("Glättung", 3, 3, 1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0,
+			1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0);
 
 	String name;
 	int rows;
 	int cols;
-	int[] data;
+	double[] data;
 
-	private Filter(String name, int rows, int cols, int... filter) {
+	private Filter(String name, int rows, int cols, double... filter) {
 		this.name = name;
 		this.rows = rows;
 		this.cols = cols;
@@ -33,7 +35,7 @@ public enum Filter {
 	}
 
 	public Mat toMat() {
-		Mat mat = new Mat(rows, cols, CvType.CV_32S);
+		Mat mat = new Mat(rows, cols, CvType.CV_32F);
 		mat.put(0, 0, this.data);
 		return mat;
 	}
