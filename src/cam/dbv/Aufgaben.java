@@ -13,7 +13,7 @@ public class Aufgaben {
 	public static void main(String[] args) {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		Aufgaben a = new Aufgaben();
-		a.halbbild();
+		a.faces();
 	}
 
 	public Aufgaben() {
@@ -21,18 +21,18 @@ public class Aufgaben {
 	}
 
 	public void filter() {
-		Mat image = TestImage.LENA.toMat();
-		new ImShow(image, "Original");
+		Mat image = TestImage.LENARAUSCHEN.toMat();
+		ImShow.show(image, "Original");
 		// Gauss
 		// image = DBV.convolve(image, Filter.KIRSCH.toMat());
 
 		Mat gaussian = Filter.getGaussianFilter(9, 1.8);
 		Mat filtered = DBV.convolve(image, gaussian);
-		new ImShow(filtered, "Gaussian Filter - " + filtered.toString());
+		ImShow.show(filtered, "Gaussian Filter - " + filtered.toString());
 
 		Mat gaussian2 = Filter.getGaussianFilter(9, 500);
 		Mat filtered2 = DBV.convolve(image, gaussian2);
-		new ImShow(filtered2, "Gaussian Filter - " + filtered2.toString());
+		ImShow.show(filtered2, "Gaussian Filter - " + filtered2.toString());
 		// others
 
 		Filter.showFiltered(image, Filter.GLAETTUNG);
@@ -53,7 +53,7 @@ public class Aufgaben {
 
 	public void filterNeighbour() {
 		Mat image = TestImage.TEXTSTRUCTURE.toMat();
-		new ImShow(image, "Original");
+		ImShow.show(image, "Original");
 
 		Filter.showFiltered(image, Filter.DERIVATIVEx);
 		Filter.showFiltered(image, Filter.DERIVATIVEy);
@@ -65,7 +65,7 @@ public class Aufgaben {
 
 	public void filterRotate() {
 		Mat image = TestImage.TEXTSTRUCTURE.toMat();
-		new ImShow(image, "Original");
+		ImShow.show(image, "Original");
 		Filter.showFiltered(image, Filter.KIRSCH);
 		Filter.showFiltered(image, Filter.KIRSCH, true);
 		// Filter.showFiltered(image, Filter.LAPLACE1, true);
@@ -73,29 +73,29 @@ public class Aufgaben {
 
 	public void sharpen() {
 		Mat image = TestImage.MOON.toMat();
-		new ImShow(image, "Original");
+		ImShow.show(image, "Original");
 		Mat imageFiltered = DBV.convolve(image, Filter.LAPLACE2.toMat());
-		new ImShow(imageFiltered, "Image filtered");
+		ImShow.show(imageFiltered, "Image filtered");
 		Mat imageSharpened = new Mat();
 		Core.subtract(image, imageFiltered, imageSharpened);
-		new ImShow(imageSharpened, "Image sharpened");
+		ImShow.show(imageSharpened, "Image sharpened");
 	}
 
 	public void harris() {
 		Mat image = TestImage.LENA.toMat();
-		new ImShow(image, "Original");
+		ImShow.show(image, "Original");
 		Mat harris = DBV.harrisPoints(image, 0.125);
-		new ImShow(harris, "Harris Points");
+		ImShow.show(harris, "Harris Points");
 	}
 
 	public void spectra() {
 		Mat image = TestImage.BRICKWALL.toMat();
-		new ImShow(image, "Original", 512, 512);
+		ImShow.show(image, "Original", 512, 512);
 		Spectrum spectrum = new Spectrum(image);
 		Mat amplitude = spectrum.getVisualizeableAmplitude();
-		new ImShow(amplitude, "Amplitude", 512, 512);
+		ImShow.show(amplitude, "Amplitude", 512, 512);
 		Mat phase = spectrum.getVisualizeablePhase();
-		new ImShow(phase, "Phase", 512, 512);
+		ImShow.show(phase, "Phase", 512, 512);
 	}
 
 	public void test2() {
@@ -107,52 +107,52 @@ public class Aufgaben {
 		ph.put(0, 0, 2, 3, 4, 5);
 		Spectrum spectrum = new Spectrum(image);
 		Mat amplitude = spectrum.getVisualizeableAmplitude();
-		new ImShow(amplitude, "Amplitude", 512, 512);
+		ImShow.show(amplitude, "Amplitude", 512, 512);
 		Mat phase = spectrum.getVisualizeablePhase();
-		new ImShow(phase, "Phase", 512, 512);
+		ImShow.show(phase, "Phase", 512, 512);
 		Spectrum a1p1 = new Spectrum(amp, ph);
 
-		new ImShow(a1p1.getImage(), "Amplitude Image 1, Phase Image 1", 512,
+		ImShow.show(a1p1.getImage(), "Amplitude Image 1, Phase Image 1", 512,
 				512);
 	}
 
 	public void spectra2() {
 		Mat img1 = TestImage.LENA.toMat();
 		Mat img2 = TestImage.BOAT.toMat();
-		new ImShow(img1, "Original1");
-		new ImShow(img2, "Original2");
+		ImShow.show(img1, "Original1");
+		ImShow.show(img2, "Original2");
 		Spectrum s1 = new Spectrum(img1);
 		Spectrum s2 = new Spectrum(img2);
 
 		Spectrum a1p1 = new Spectrum(s1.getAmplitude(), s1.getPhase());
-		new ImShow(a1p1.getImage(), "Amplitude Image 1, Phase Image 1", 512,
+		ImShow.show(a1p1.getImage(), "Amplitude Image 1, Phase Image 1", 512,
 				512);
 
 		Spectrum a1p2 = new Spectrum(s1.getAmplitude(), s2.getPhase());
-		new ImShow(a1p2.getImage(), "Amplitude Image 1, Phase Image 2", 512,
+		ImShow.show(a1p2.getImage(), "Amplitude Image 1, Phase Image 2", 512,
 				512);
 		Spectrum a2p1 = new Spectrum(s2.getAmplitude(), s1.getPhase());
-		new ImShow(a2p1.getImage(), "Amplitude Image 2, Phase Image 1", 512,
+		ImShow.show(a2p1.getImage(), "Amplitude Image 2, Phase Image 1", 512,
 				512);
 
 	}
 
 	public void reshapedSpectra() {
 		Mat img1 = TestImage.LENA.toMat();
-		new ImShow(img1, "Original1");
+		ImShow.show(img1, "Original1");
 		Spectrum s1 = new Spectrum(img1);
 		int w = (int) img1.size().width;
 		int h = (int) img1.size().height;
 
-		new ImShow(s1.getVisualizeableAmplitude(), "Amplitude", 512, 512);
+		ImShow.show(s1.getVisualizeableAmplitude(), "Amplitude", 512, 512);
 
 		s1.reshapeAmplitude(new Rect(w / 4, h / 4, w / 2, h / 2));
 
-		new ImShow(s1.getVisualizeableAmplitude(), "reshaped Amplitude", 512,
+		ImShow.show(s1.getVisualizeableAmplitude(), "reshaped Amplitude", 512,
 				512);
 		Spectrum a1p1 = new Spectrum(s1.getAmplitude(), s1.getPhase());
 
-		new ImShow(a1p1.getImage(), "Result", 512, 512);
+		ImShow.show(a1p1.getImage(), "Result", 512, 512);
 
 	}
 
@@ -170,60 +170,70 @@ public class Aufgaben {
 		int h = (int) img1.size().height;
 		Spectrum a2p2 = new Spectrum(s1.getAmplitude(), s1.getPhase());
 		Mat amp = s1.getAmplitude();
-		new ImShow(s1.getVisualizeableAmplitude(), "Amplitude", 1024, 1024);
+		ImShow.show(s1.getVisualizeableAmplitude(), "Amplitude", 1024, 1024);
 		Mat gaussian = Filter.getGaussianFilter(15, 2.5);
-		Mat filtered = DBV.convolve(amp, gaussian);
+		// Mat filtered = DBV.convolve(amp, gaussian);
+		Mat filtered = amp.clone();
 
 		Spectrum a1p1 = new Spectrum(filtered, s1.getPhase());
-		new ImShow(a1p1.getImage(), "Result filtered", 512, 512);
+		ImShow.show(a1p1.getImage(), "Result filtered", 512, 512);
 
 		Mat sAmp = s1.getAmplitude();
 		Core.MinMaxLocResult res = Core.minMaxLoc(sAmp);
 		System.out.println("Amplitude max Value " + res.maxVal
 				+ " at Position " + res.maxLoc + " (not shifted)");
 		Mat sMax = new Mat();
-		Core.min(sAmp, Scalar.all(120), sMax);
+		// Core.min(sAmp, Scalar.all(120), sMax);
 		sMax = sAmp;
-		sMax.convertTo(sAmp, CvType.CV_32F);
+		sMax = DBV.dftShift(sMax);
+		sMax.put(246, 240, 0);
+		sMax.put(266, 272, 0);
+		sMax.put(240, 256, 0);
+		sMax.put(272, 256, 0);
+		sMax.put(256, 256, 0);
+		sMax = DBV.dftShift(sMax);
+		System.out.println(sMax);
+		// sMax.convertTo(sAmp, CvType.CV_32F);
 
 		// // ???????? ///
 
 		// Imgproc.threshold(sMax, sMax, 80, 80, Imgproc.THRESH_TRUNC);
 		Spectrum a3p3 = new Spectrum(sMax, s1.getPhase());
-		new ImShow(a3p3.getVisualizeableAmplitude(), "Amplitude cropped", 1024,
-				1024);
-		new ImShow(a3p3.getImage(), "Result cropped", 512, 512);
+		ImShow.show(a3p3.getVisualizeableAmplitude(), "Amplitude cropped",
+				1024, 1024);
+		ImShow.show(a3p3.getImage(), "Result cropped", 512, 512);
 
 	}
 
 	public void lowpass() {
 		int cutoff = 50;
 		int order = 5;
-		Mat img = TestImage.TESTIMAGE.toMat();
+		Mat img = TestImage.LENARAUSCHEN.toMat();
+		Imgproc.cvtColor(img, img, Imgproc.COLOR_RGB2GRAY);
 		img = DBV.padded(img, img.width() / 2);
 		img = DBV.dftShift(DBV.dft(img));
-		img.convertTo(img, CvType.CV_64F);
+		// img.convertTo(img, CvType.CV_64F);
 		Mat distances = PassFilter.getDistances(img.width(), img.height());
 
 		Mat idealLF = PassFilter.getIdealLowpass(distances, cutoff);
 		Mat imgILF = DBV.multiply(img, idealLF);
 		imgILF = DBV.real(DBV.idft(DBV.dftShift(imgILF)));
-		new ImShow(imgILF, "Ideal Lowpass Filtered", 512, 512);
+		ImShow.show(imgILF, "Ideal Lowpass Filtered", 512, 512);
 
 		Mat gaussianLF = PassFilter.getGaussianLowpass(distances, cutoff);
 		Mat imgGLF = DBV.multiply(img, gaussianLF);
 		imgGLF = DBV.real(DBV.idft(DBV.dftShift(imgGLF)));
-		new ImShow(imgGLF, "Gaussian Lowpass Filtered", 512, 512);
+		ImShow.show(imgGLF, "Gaussian Lowpass Filtered", 512, 512);
 
 		Mat butterworthLF = PassFilter.getButterworthLowpass(distances, cutoff,
 				order);
 		Mat imgBLF = DBV.multiply(img, butterworthLF);
 		imgBLF = DBV.real(DBV.idft(DBV.dftShift(imgBLF)));
-		new ImShow(imgBLF, "Butterworth Lowpass Filtered", 512, 512);
+		ImShow.show(imgBLF, "Butterworth Lowpass Filtered", 512, 512);
 
 		Spectrum s = new Spectrum(imgGLF);
-		new ImShow(s.getVisualizeableAmplitude(), "Amplitude filtered, cutoff="
-				+ cutoff, 512, 512);
+		ImShow.show(s.getVisualizeableAmplitude(),
+				"Amplitude filtered, cutoff=" + cutoff, 512, 512);
 	}
 
 	public void highpass() {
@@ -232,33 +242,34 @@ public class Aufgaben {
 		Mat img = TestImage.TESTIMAGE.toMat();
 		img = DBV.padded(img, img.width() / 2);
 		img = DBV.dftShift(DBV.dft(img));
+
 		// img.convertTo(img, CvType.CV_64F);
 		Mat distances = PassFilter.getDistances(img.width(), img.height());
 
 		Mat idealLF = PassFilter.getIdealHighpass(distances, cutoff);
 		Mat imgILF = DBV.multiply(img, idealLF);
 		imgILF = DBV.real(DBV.idft(DBV.dftShift(imgILF)));
-		new ImShow(imgILF, "Ideal Highpass Filtered", 512, 512, true);
+		ImShow.show(imgILF, "Ideal Highpass Filtered", 512, 512, true);
 
 		Mat gaussianLF = PassFilter.getGaussianHighpass(distances, cutoff);
 		Mat imgGLF = DBV.multiply(img, gaussianLF);
 		imgGLF = DBV.real(DBV.idft(DBV.dftShift(imgGLF)));
-		new ImShow(imgGLF, "Gaussian Highpass Filtered", 512, 512, true);
+		ImShow.show(imgGLF, "Gaussian Highpass Filtered", 512, 512, true);
 
 		Mat butterworthLF = PassFilter.getButterworthHighpass(distances,
 				cutoff, order);
 		Mat imgBLF = DBV.multiply(img, butterworthLF);
 		imgBLF = DBV.real(DBV.idft(DBV.dftShift(imgBLF)));
-		new ImShow(imgBLF, "Butterworth Highpass Filtered", 512, 512, true);
+		ImShow.show(imgBLF, "Butterworth Highpass Filtered", 512, 512, true);
 
 		Spectrum s1 = new Spectrum(imgILF);
-		new ImShow(s1.getVisualizeableAmplitude(),
+		ImShow.show(s1.getVisualizeableAmplitude(),
 				"Amplitude ideal filtered, cutoff=" + cutoff, 512, 512);
 		Spectrum s2 = new Spectrum(imgGLF);
-		new ImShow(s2.getVisualizeableAmplitude(),
+		ImShow.show(s2.getVisualizeableAmplitude(),
 				"Amplitude gauss filtered, cutoff=" + cutoff, 512, 512);
 		Spectrum s3 = new Spectrum(imgBLF);
-		new ImShow(s3.getVisualizeableAmplitude(),
+		ImShow.show(s3.getVisualizeableAmplitude(),
 				"Amplitude butterworth filtered, cutoff=" + cutoff, 512, 512);
 
 	}
@@ -275,12 +286,12 @@ public class Aufgaben {
 		Flow flow12b = new Flow(image1, image2b);
 		Flow flow34 = new Flow(image3, image4);
 
-		new ImShow(flow12.difference(), "Flow of 1+2 (difference)");
-		new ImShow(flow12b.difference(), "Flow of 1+2b (difference)");
-		new ImShow(flow12b.phaseDifference(),
+		ImShow.show(flow12.difference(), "Flow of 1+2 (difference)");
+		ImShow.show(flow12b.difference(), "Flow of 1+2b (difference)");
+		ImShow.show(flow12b.phaseDifference(),
 				"Flow of 1+2b (difference without amplitude, phase only)");
 
-		new ImShow(flow34.difference(), "Flow of 3+4 (difference)");
+		ImShow.show(flow34.difference(), "Flow of 3+4 (difference)");
 
 	}
 
@@ -288,7 +299,7 @@ public class Aufgaben {
 		Mat image = TestImage.LENA.toMat();
 		Imgproc.cvtColor(image, image, Imgproc.COLOR_RGB2GRAY);
 		image.convertTo(image, CvType.CV_64F);
-		new ImShow(image, "Original");
+		ImShow.show(image, "Original");
 
 		double[] imageV = new double[(int) image.total()];
 		image.get(0, 0, imageV);
@@ -305,7 +316,7 @@ public class Aufgaben {
 		}
 
 		newImage.put(0, 0, newV);
-		new ImShow(newImage, "new image", 512, 512);
+		ImShow.show(newImage, "new image", 512, 512);
 		image = DBV.convolve(image, Filter.getGaussianFilter(3, 2));
 		image.get(0, 0, imageV);
 		for (int i = 0; i < image.height(); i++) {
@@ -317,7 +328,18 @@ public class Aufgaben {
 			}
 		}
 		newImage.put(0, 0, newV);
-		new ImShow(newImage, "new image, gaussian shaped before", 512, 512);
+		ImShow.show(newImage, "new image, gaussian shaped before", 512, 512);
+	}
+
+	public void faces() {
+		Faces faces = new Faces(TestImage.FACES10X5.toMat(), 5, 10, 50);
+		ImShow.show(faces.getEigenvectors(), "Eigenvectors", true);
+		ImShow.showDoubled(faces.getMean(), "Mean", true);
+		ImShow.show(faces.getResult(), "Result", true);
+		for (int i = 0; i < 5; i++) {
+			ImShow.showDoubled(faces.getPC(i), "PC" + i, true);
+		}
+		ImShow.show(faces.detect(TestImage.LENA.toMat()), "Detected Face");
 	}
 
 }

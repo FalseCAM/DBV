@@ -59,14 +59,14 @@ public enum Filter {
 	 */
 	public static void showFiltered(Mat image, Filter filter) {
 		Mat filtered = DBV.convolve(image, filter.toMat());
-		new ImShow(filtered, filter.toString() + " - " + filtered.toString());
+		ImShow.show(filtered, filter.toString() + " - " + filtered.toString());
 	}
 
 	public static void showFiltered(Mat image, Filter filter, boolean rotate) {
 		if (rotate) {
 			Mat filtered = DBV.convolveRotate(image, filter.toMat());
-			new ImShow(filtered, filter.toString() + " - "
-					+ filtered.toString());
+			ImShow.show(filtered,
+					filter.toString() + " - " + filtered.toString());
 		} else {
 			showFiltered(image, filter);
 		}

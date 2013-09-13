@@ -27,51 +27,11 @@ public class ImShow extends JFrame {
 
 	Mat image;
 
-	public ImShow(Mat image, String title) {
-
-		this.image = image;
-		BufferedImage img = null;
-		img = matToImage(DBV.real(image));
-
-		showImage(img);
-
-		this.setTitle(title);
-
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		this.setVisible(true);
-	}
-
-	public ImShow(Mat image, String title, int width, int height) {
-
-		BufferedImage img = matToImage(image);
-
-		showImage(img.getScaledInstance(width, height, Image.SCALE_FAST));
-
-		this.setTitle(title);
-
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		this.setVisible(true);
+	private ImShow() {
 
 	}
 
-	public ImShow(Mat image, String title, int width, int height,
-			boolean normalize) {
-		Mat image2 = image.clone();
-		if (normalize) {
-			Core.normalize(image2, image2, 0, 255, Core.NORM_MINMAX);
-		}
-		BufferedImage img = matToImage(image2);
-
-		showImage(img.getScaledInstance(width, height, Image.SCALE_FAST));
-
-		this.setTitle(title);
-
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		this.setVisible(true);
-
-	}
-
-	BufferedImage matToImage(Mat image) {
+	static BufferedImage matToImage(Mat image) {
 		Mat image_tmp = image.clone();
 
 		MatOfByte matOfByte = new MatOfByte();
@@ -96,6 +56,45 @@ public class ImShow extends JFrame {
 		// add(new JScrollPane(new JTextArea(image.dump())),
 		// BorderLayout.SOUTH);
 		pack();
+	}
+
+	public static void show(Mat img) {
+		show(img, "");
+
+	}
+
+	public static void show(Mat img, String title) {
+		show(img, title, img.width(), img.height());
+	}
+
+	public static void show(Mat img, String title, boolean normalize) {
+		show(img, title, img.width(), img.height(), normalize);
+	}
+
+	public static void showDoubled(Mat img, String title, boolean normalize) {
+		show(img, title, img.width() * 2, img.height() * 2, normalize);
+	}
+
+	public static void show(Mat img, String title, int width, int height) {
+		show(img, title, width, height, false);
+	}
+
+	public static void show(Mat img, String title, int width, int height,
+			boolean normalize) {
+		Mat image = img.clone();
+		if (normalize) {
+			Core.normalize(image, image, 0, 255, Core.NORM_MINMAX);
+		}
+
+		BufferedImage bimg = matToImage(image);
+
+		ImShow window = new ImShow();
+		window.setTitle(title);
+		window.showImage(bimg
+				.getScaledInstance(width, height, Image.SCALE_FAST));
+		window.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		window.setVisible(true);
+
 	}
 
 }

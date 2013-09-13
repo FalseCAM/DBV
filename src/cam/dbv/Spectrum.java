@@ -31,6 +31,7 @@ public class Spectrum {
 		calcImage();
 	}
 
+	// amplitude * exp(j*phase)
 	private void calcImage() {
 		Mat image = new Mat(amplitude.size(), CvType.CV_64F);
 		Mat cPhase = phase.clone();
@@ -42,7 +43,6 @@ public class Spectrum {
 		image = DBV.multiply(cAmp, cPhase);
 		image = DBV.idft(image);
 		this.image = DBV.real(image);
-
 	}
 
 	private void calcSpectrum() {
