@@ -13,7 +13,7 @@ public class Aufgaben {
 	public static void main(String[] args) {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		Aufgaben a = new Aufgaben();
-		a.faces();
+		a.interpolation();
 	}
 
 	public Aufgaben() {
@@ -154,6 +154,19 @@ public class Aufgaben {
 
 		ImShow.show(a1p1.getImage(), "Result", 512, 512);
 
+	}
+
+	public void differentiationsTheorem() {
+		Mat img = TestImage.LENA.toMat();
+		ImShow.show(img, "Original");
+		Spectrum s = new Spectrum(img);
+		ImShow.show(s.getVisualizeableAmplitude(), "Original Amplitude");
+		Mat filteredx = DBV.convolve(img, Filter.DERIVATIVEx.toMat());
+		Spectrum sx = new Spectrum(filteredx);
+		ImShow.show(sx.getVisualizeableAmplitude(), "Filtered Amplitude (x)");
+		Mat filteredy = DBV.convolve(img, Filter.DERIVATIVEy.toMat());
+		Spectrum sy = new Spectrum(filteredy);
+		ImShow.show(sy.getVisualizeableAmplitude(), "Filtered Amplitude (y)");
 	}
 
 	public void dumpSpectra() {
@@ -301,34 +314,22 @@ public class Aufgaben {
 		image.convertTo(image, CvType.CV_64F);
 		ImShow.show(image, "Original");
 
-		double[] imageV = new double[(int) image.total()];
-		image.get(0, 0, imageV);
-		double[] newV = new double[(int) (image.total() / 4)];
-		Mat newImage = new Mat(image.width() / 2, image.height() / 2,
-				image.type());
-		for (int i = 0; i < image.height(); i++) {
-			for (int j = 0; j < image.width(); j++) {
-				if (i % 2 == 0 && j % 2 == 0) {
-					newV[(i / 2) * newImage.width() + j / 2] = imageV[i
-							* image.width() + j];
-				}
-			}
-		}
+		ImShow.show(Interpolation.halve(image), "new image", 512, 512);
 
-		newImage.put(0, 0, newV);
-		ImShow.show(newImage, "new image", 512, 512);
-		image = DBV.convolve(image, Filter.getGaussianFilter(3, 2));
-		image.get(0, 0, imageV);
-		for (int i = 0; i < image.height(); i++) {
-			for (int j = 0; j < image.width(); j++) {
-				if (i % 2 == 0 && j % 2 == 0) {
-					newV[(i / 2) * newImage.width() + j / 2] = imageV[i
-							* image.width() + j];
-				}
-			}
-		}
-		newImage.put(0, 0, newV);
-		ImShow.show(newImage, "new image, gaussian shaped before", 512, 512);
+		ImShow.show(Interpolation.halveNGauss(image),
+				"new image, gaussian shaped before", 512, 512);
+	}
+
+	public void interpolation() {
+		Mat image = TestImage.LENA.toMat();
+		Imgproc.cvtColor(image, image, Imgproc.COLOR_RGB2GRAY);
+		image.convertTo(image, CvType.CV_64F);
+		ImShow.show(image, "Original");
+
+		ImShow.show(Interpolation.nearestNeighbor(image),
+				"nearest Neighbor Interpolation");
+
+		ImShow.show(Interpolation.bilinear(image), "bilinear Interpolation");
 	}
 
 	public void faces() {
