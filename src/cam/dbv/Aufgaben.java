@@ -10,12 +10,6 @@ import org.opencv.imgproc.Imgproc;
 
 public class Aufgaben {
 
-	public static void main(String[] args) {
-		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-		Aufgaben a = new Aufgaben();
-		a.interpolation();
-	}
-
 	public Aufgaben() {
 
 	}
@@ -28,20 +22,20 @@ public class Aufgaben {
 
 		Mat gaussian = Filter.getGaussianFilter(9, 1.8);
 		Mat filtered = DBV.convolve(image, gaussian);
-		ImShow.show(filtered, "Gaussian Filter - " + filtered.toString());
+		// ImShow.show(filtered, "Gaussian Filter - " + filtered.toString());
 
 		Mat gaussian2 = Filter.getGaussianFilter(9, 500);
 		Mat filtered2 = DBV.convolve(image, gaussian2);
-		ImShow.show(filtered2, "Gaussian Filter - " + filtered2.toString());
+		// ImShow.show(filtered2, "Gaussian Filter - " + filtered2.toString());
 		// others
 
-		Filter.showFiltered(image, Filter.GLAETTUNG);
-		// Filter.showFiltered(image, Filter.DERIVATIVEx);
+		// Filter.showFiltered(image, Filter.GLAETTUNG);
+		Filter.showFiltered(image, Filter.DERIVATIVEx);
 		// Filter.showFiltered(image, Filter.DERIVATIVEy);
 		// Filter.showFiltered(image, Filter.KIRSCH);
 		// Filter.showFiltered(image, Filter.LAPLACE1);
 		// Filter.showFiltered(image, Filter.LAPLACE2);
-		// Filter.showFiltered(image, Filter.PREWITTh);
+		Filter.showFiltered(image, Filter.PREWITTh);
 		// Filter.showFiltered(image, Filter.PREWITTv);
 		// Filter.showFiltered(image, Filter.ROBERTSCROSSn);
 		// Filter.showFiltered(image, Filter.ROBERTSCROSSp);
@@ -75,7 +69,7 @@ public class Aufgaben {
 		Mat image = TestImage.MOON.toMat();
 		ImShow.show(image, "Original");
 		Mat imageFiltered = DBV.convolve(image, Filter.LAPLACE2.toMat());
-		ImShow.show(imageFiltered, "Image filtered");
+		ImShow.show(imageFiltered, "Image Laplace filtered");
 		Mat imageSharpened = new Mat();
 		Core.subtract(image, imageFiltered, imageSharpened);
 		ImShow.show(imageSharpened, "Image sharpened");
@@ -203,7 +197,7 @@ public class Aufgaben {
 		sMax.put(266, 272, 0);
 		sMax.put(240, 256, 0);
 		sMax.put(272, 256, 0);
-		sMax.put(256, 256, 0);
+		// sMax.put(256, 256, 0);
 		sMax = DBV.dftShift(sMax);
 		System.out.println(sMax);
 		// sMax.convertTo(sAmp, CvType.CV_32F);
@@ -300,6 +294,8 @@ public class Aufgaben {
 		Flow flow34 = new Flow(image3, image4);
 
 		ImShow.show(flow12.difference(), "Flow of 1+2 (difference)");
+		ImShow.show(flow12.quotient(), "Flow of 1+2 (quotient)");
+
 		ImShow.show(flow12b.difference(), "Flow of 1+2b (difference)");
 		ImShow.show(flow12b.phaseDifference(),
 				"Flow of 1+2b (difference without amplitude, phase only)");
@@ -333,7 +329,7 @@ public class Aufgaben {
 	}
 
 	public void faces() {
-		Faces faces = new Faces(TestImage.FACES10X5.toMat(), 5, 10, 50);
+		Faces faces = new Faces(TestImage.FACES20X1.toMat(), 1, 20, 20);
 		ImShow.show(faces.getEigenvectors(), "Eigenvectors", true);
 		ImShow.showDoubled(faces.getMean(), "Mean", true);
 		ImShow.show(faces.getResult(), "Result", true);

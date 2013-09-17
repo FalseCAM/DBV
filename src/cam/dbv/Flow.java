@@ -67,8 +67,6 @@ public class Flow {
 			for (int j = window_center + 1; j < image_size.height
 					- window_center; j++) {
 
-				
-				
 			}
 		}
 
@@ -77,6 +75,13 @@ public class Flow {
 	public Mat difference() {
 		Mat difference = new Mat();
 		Core.subtract(image1, image2, difference);
+		return difference;
+
+	}
+
+	public Mat quotient() {
+		Mat difference = new Mat();
+		Core.divide(image1, image2, difference);
 		return difference;
 
 	}
